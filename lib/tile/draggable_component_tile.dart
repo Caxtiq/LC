@@ -7,18 +7,22 @@ class DraggableComponentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Draggable<String>(
-      data: type,
-      child: ListTile(title: Text(type)),
+    return Draggable<Map<String, dynamic>>(
+      data: {'type': type},  
       feedback: Material(
         elevation: 4.0,
         child: Container(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           color: Colors.blue[100],
           child: Text(type),
         ),
       ),
-      childWhenDragging: ListTile(title: Text(type), enabled: false),
+      child: ListTile(title: Text(type)),  
+      childWhenDragging: ListTile(
+        title: Text(type),
+        enabled: false,
+      ),
     );
   }
 }
+

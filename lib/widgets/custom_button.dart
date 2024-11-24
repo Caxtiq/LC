@@ -35,7 +35,7 @@ class CustomButton extends StatelessWidget {
       height: component.size.height,
       child: ElevatedButton(
         onPressed: () {
-          // Handle button press
+          //button press
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,

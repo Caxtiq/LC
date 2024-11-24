@@ -33,7 +33,7 @@ class CustomIcon extends StatelessWidget {
             final pageState = Provider.of<PageState>(context, listen: false);
             pageState.setCurrentPage(navigateTo);
           }
-          // Add more actions here as needed
+          //more actions
         },
         child: iconWidget,
       );

@@ -151,8 +151,8 @@ Widget _buildEditForm(BuildContext context, String pageId, CanvasComponent compo
       return _buildImageEditForm(context, pageId, component);
      case 'Icon':
       return _buildIconEditForm(context, pageId, component);
-    // case 'Container':
-    //   return _buildContainerEditForm(context, pageId, component);
+     case 'Container':
+       return _buildContainerEditForm(context, pageId, component);
     default:
       return Container(child: Text('No edit form available for this component type.'));
   }
@@ -275,6 +275,99 @@ Widget _buildEditForm(BuildContext context, String pageId, CanvasComponent compo
       },
     );
   }
+Widget _buildContainerEditForm(BuildContext context, String pageId, CanvasComponent component) {
+  final canvasState = Provider.of<CanvasState>(context, listen: false);
+  final pageState = Provider.of<PageState>(context, listen: false);
+
+  return StatefulBuilder(
+    builder: (BuildContext context, StateSetter setState) {
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // TextField for Container Color
+            ElevatedButton(
+              onPressed: () async {
+                final Color? color = await showColorPicker(context, component.properties['backgroundColor'] ?? 0xFFE0E0E0);
+                if (color != null) {
+                  canvasState.updateComponentProperties(pageId, component.id, {'backgroundColor': color.value});
+                }
+              },
+              child: Text('Background Color'),
+            ),
+            SizedBox(height: 10),
+
+            // Border Radius Input Field
+            TextFormField(
+              initialValue: (component.properties['borderRadius'] ?? 8.0).toString(),
+              decoration: InputDecoration(labelText: 'Border Radius'),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                canvasState.updateComponentProperties(pageId, component.id, {'borderRadius': double.tryParse(value) ?? 8.0});
+              },
+            ),
+            SizedBox(height: 10),
+
+            // Padding Input Field
+            TextFormField(
+              initialValue: (component.properties['padding'] ?? [0.0, 0.0, 0.0, 0.0]).toString(),
+              decoration: InputDecoration(labelText: 'Padding (top, right, bottom, left)'),
+              onChanged: (value) {
+                List<double> paddingValues = _parsePadding(value);
+                canvasState.updateComponentProperties(pageId, component.id, {'padding': paddingValues});
+              },
+            ),
+            SizedBox(height: 10),
+
+            // Margin Input Field
+            TextFormField(
+              initialValue: (component.properties['margin'] ?? [0.0, 0.0, 0.0, 0.0]).toString(),
+              decoration: InputDecoration(labelText: 'Margin (top, right, bottom, left)'),
+              onChanged: (value) {
+                List<double> marginValues = _parsePadding(value); // Reuse padding parsing logic for margin
+                canvasState.updateComponentProperties(pageId, component.id, {'margin': marginValues});
+              },
+            ),
+            SizedBox(height: 10),
+
+            // Shadow Toggle
+            SwitchListTile(
+              title: Text('Enable Shadow'),
+              value: component.properties['hasShadow'] ?? false,
+              onChanged: (value) {
+                canvasState.updateComponentProperties(pageId, component.id, {'hasShadow': value});
+              },
+            ),
+            SizedBox(height: 10),
+
+            // Box Shadow Color Picker
+            if (component.properties['hasShadow'] ?? false)
+              ElevatedButton(
+                onPressed: () async {
+                  final Color? color = await showColorPicker(context, component.properties['shadowColor'] ?? 0xFF000000);
+                  if (color != null) {
+                    canvasState.updateComponentProperties(pageId, component.id, {'shadowColor': color.value});
+                  }
+                },
+                child: Text('Shadow Color'),
+              ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+List<double> _parsePadding(String value) {
+  try {
+    final values = value.split(',').map((e) => double.tryParse(e.trim()) ?? 0.0).toList();
+    if (values.length == 4) {
+      return values;
+    }
+  } catch (e) {
+  }
+  return [0.0, 0.0, 0.0, 0.0]; 
+}
 
   IconData _getIconData(String iconName) {
     switch (iconName) {
